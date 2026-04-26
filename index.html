@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线上自习室</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部：创建自习室、刷新、关于作者 -->
+        <header class="header">
+            <h1 class="title">📚 线上自习室</h1>
+            <div class="header-buttons">
+                <button class="btn btn-primary" id="createRoomBtn">➕ 创建自习室</button>
+                <button class="btn btn-secondary" id="refreshBtn">🔄 刷新</button>
+                <button class="btn btn-secondary" id="aboutBtn">📖 关于作者</button>
+            </div>
+        </header>
+
+        <!-- 快速加入区域 -->
+        <div class="quick-join card">
+            <h3>🚀 快速加入</h3>
+            <div class="join-form">
+                <input type="text" id="quickJoinRoomId" placeholder="输入房间号" class="input">
+                <input type="text" id="quickJoinName" placeholder="你的名字（可选）" class="input">
+                <button class="btn btn-primary" id="quickJoinBtn">加入房间</button>
+            </div>
+        </div>
+
+        <!-- 可用自习室列表 -->
+        <div class="rooms-section">
+            <h2>📖 可用自习室</h2>
+            <div class="rooms-grid" id="roomsGrid">
+                <!-- 动态生成房间卡片 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建自习室弹窗 -->
+    <div id="createModal" class="modal" style="display: none;">
+        <div class="modal-overlay" id="createModalOverlay"></div>
+        <div class="modal-content">
+            <h2>📝 创建自习室</h2>
+            <div class="form-group">
+                <label>房间名称</label>
+                <input type="text" id="roomName" placeholder="给自习室起个名字" class="input">
+            </div>
+            <div class="form-group">
+                <label>最大人数</label>
+                <input type="number" id="maxCount" min="2" max="20" value="10" class="input">
+            </div>
+            <div class="form-group">
+                <label>密码（可选）</label>
+                <input type="password" id="roomPassword" placeholder="留空则无密码" class="input">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancelCreateBtn">取消</button>
+                <button class="btn btn-primary" id="confirmCreateBtn">创建房间</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于作者弹窗 -->
+    <div id="aboutModal" class="modal" style="display: none;">
+        <div class="modal-overlay" id="aboutModalOverlay"></div>
+        <div class="modal-content about-modal">
+            <h2>📖 线上自习室</h2>
+            <div class="about-info">
+                <p><strong>版本：</strong>v1.0</p>
+                <p><strong>开发者：</strong>郑智鹏</p>
+                <p><strong>邮箱：</strong>15702419317@163.com</p>
+                <p><strong>QQ：</strong>Galler wei</p>
+                <p><strong>Twitter：</strong>Galler唯</p>
+                <p class="copyright">© 2025 郑智鹏 版权所有</p>
+            </div>
+            <button class="btn btn-primary" id="closeAboutBtn">关闭</button>
+        </div>
+    </div>
+
+    <!-- 自习室界面 -->
+    <div id="roomView" class="room-view" style="display: none;">
+        <div class="room-container">
+            <div class="room-header">
+                <div class="room-info-bar">
+                    <span id="roomInfo">🏠 房间号：--- | 👥 在线：0人</span>
+                    <button class="btn btn-secondary" id="leaveRoomBtn">🚪 离开</button>
+                </div>
+                <div class="room-tabs">
+                    <button class="tab active" data-tab="video">🎥 自习室</button>
+                    <button class="tab" data-tab="pomodoro">🍅 番茄钟</button>
+                    <button class="tab" data-tab="chat">💬 聊天</button>
+                </div>
+            </div>
+
+            <div class="room-content">
+                <!-- 视频区域 -->
+                <div id="videoPanel" class="video-area">
+                    <div class="video-grid" id="videoGrid">
+                        <div class="video-card local-video">
+                            <video id="localVideo" autoplay playsinline muted class="video"></video>
+                            <div class="video-name">我</div>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="btn btn-secondary" id="toggleMicBtn">🎤 关闭麦克风</button>
+                        <button class="btn btn-secondary" id="toggleCameraBtn">📷 关闭摄像头</button>
+                    </div>
+                </div>
+
+                <!-- 番茄钟区域（初始隐藏） -->
+                <div id="pomodoroPanel" class="pomodoro-area" style="display: none;">
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-primary" id="startTimerBtn">开始</button>
+                        <button class="btn btn-secondary" id="pauseTimerBtn" style="display: none;">暂停</button>
+                        <button class="btn btn-secondary" id="resetTimerBtn">重置</button>
+                    </div>
+                    <div class="timer-status" id="timerStatus">专注时间</div>
+                </div>
+
+                <!-- 聊天区域（初始隐藏） -->
+                <div id="chatPanel" class="chat-area" style="display: none;">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message">
+                            <span class="chat-name">系统：</span>
+                            <span class="chat-text">欢迎来到自习室！</span>
+                            <span class="chat-time">刚刚</span>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="输入消息..." class="input chat-input">
+                        <button class="btn btn-primary" id="sendMsgBtn">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
